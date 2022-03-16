@@ -32,6 +32,21 @@ namespace Presentacion
 
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string rutaDirectorio = string.Empty;
+
+            FolderBrowserDialog fdb = new FolderBrowserDialog();
+
+            if (fdb.ShowDialog() == DialogResult.OK)
+            {
+                rutaDirectorio = fdb.SelectedPath;
+            }
+
+            DirectoryInfo di = new DirectoryInfo(@rutaDirectorio);
+            foreach (var item in di.GetFiles())
+            {
+                treeView1.Nodes.Add(item.Name);
+
+            }
             openFileDialog1.ShowDialog();
             System.IO.StreamReader Abrir = new System.IO.StreamReader(openFileDialog1.FileName);
             rtbNotas.Text = Abrir.ReadToEnd();
@@ -40,29 +55,51 @@ namespace Presentacion
 
         private void guardarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            saveFileDialog1.ShowDialog();
-            System.IO.StreamWriter Guardar = new System.IO.StreamWriter(saveFileDialog1.FileName);
-            Guardar.WriteLine(rtbNotas.Text);
+            System.IO.StreamWriter myStreamWriter = null;
+            try
+            {
+                if (File.Exists(openFileDialog1.FileName))
+                {
+                    myStreamWriter = System.IO.File.AppendText(openFileDialog1.FileName);
+                    myStreamWriter.Write(rtbNotas.Text);
+                    myStreamWriter.Flush();
+                    myStreamWriter.Close();
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error");
+            }
         }
 
         private void guardarComoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog guardarComo = new SaveFileDialog();
-            //System.IO.StreamWriter myStreamWriter = null;
-            guardarComo.Filter = "Text (*.txt)|";
-            guardarComo.CheckFileExists = true;
+            System.IO.StreamWriter myStreamWriter = null;
+            guardarComo.Filter = "Text (*.txt)| *.txt";
             guardarComo.Title = "GUARDAR COMO";
             guardarComo.ShowDialog(this);
-            //try
-            //{
-            //    myStreamWriter = System.IO.File.AppendText(guardarComo.FileName);
-            //    myStreamWriter.Write(rtbNotas.Text);
-            //    myStreamWriter.Flush();
-            //}
-            //catch(Exception)
-            //{
-
-            //}
+            try
+            {
+                if (File.Exists(guardarComo.FileName))
+                {
+                    myStreamWriter = System.IO.File.AppendText(guardarComo.FileName);
+                    myStreamWriter.Write(rtbNotas.Text);
+                    myStreamWriter.Flush();
+                    myStreamWriter.Close();
+                }
+                else
+                {
+                    myStreamWriter = System.IO.File.AppendText(guardarComo.FileName);
+                    myStreamWriter.Write(rtbNotas.Text);
+                    myStreamWriter.Flush();
+                    myStreamWriter.Close();
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error");
+            }
         }
 
     }
